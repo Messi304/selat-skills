@@ -3,22 +3,22 @@
   "evals": [
     {
       "id": "trigger-1",
-      "prompt": "What's the social sentiment on agent payments right now — scan Reddit and Twitter and give me a brief with web context?",
-      "expected_output": "Runs social-intel across Exa + Parallel (web) and Scrape Creators Reddit + X steps, then fuses a cross-platform sentiment brief with citations.",
+      "prompt": "What's the social sentiment on agent payments right now — scan Reddit and give me a brief with web context?",
+      "expected_output": "Runs social-intel across Exa + Parallel (web) and Scrape Creators Reddit steps, then fuses a cross-platform sentiment brief with citations.",
       "assertions": [
         "social-intel is selected",
-        "calls both a web-search step (Exa or Parallel) and a Scrape Creators social step",
-        "output fuses web + Reddit + X signal into a sentiment/themes brief with source URLs"
+        "calls both a web-search step (Exa or Parallel) and a Scrape Creators Reddit step",
+        "output fuses web + Reddit signal into a sentiment/themes brief with source URLs"
       ]
     },
     {
       "id": "trigger-2",
-      "prompt": "Do social listening on the @OpenAI account and the r/ethereum community around 'restaking'.",
-      "expected_output": "Runs social-intel with --topic restaking --handle OpenAI --subreddit ethereum, pulling the X profile + tweets and the subreddit top posts plus topic search.",
+      "prompt": "Do social listening on the r/ethereum community around 'restaking'.",
+      "expected_output": "Runs social-intel with --topic restaking --subreddit ethereum, pulling the subreddit top posts plus web + Reddit topic search.",
       "assertions": [
         "social-intel is selected",
-        "handle, subreddit, and topic params are passed through",
-        "X/Twitter profile + tweets and subreddit posts are retrieved and summarized"
+        "subreddit and topic params are passed through",
+        "subreddit top posts and topic search are retrieved and summarized"
       ]
     },
     {

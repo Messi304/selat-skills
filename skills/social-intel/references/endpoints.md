@@ -13,10 +13,8 @@ on Base), no API keys.
 | 2 | Web corroboration — Parallel | POST | `https://parallelmpp.dev/api/search` | routed MPP | $0.011 |
 | 3 | Reddit keyword search — Scrape Creators | GET | `https://mpp.orthogonal.com/scrapecreators/v1/reddit/search?query=${topic}` | routed MPP | $0.021 |
 | 4 | Reddit subreddit top posts — Scrape Creators | GET | `https://mpp.orthogonal.com/scrapecreators/v1/reddit/subreddit?subreddit=${subreddit}` | routed MPP | $0.021 |
-| 5 | X/Twitter profile — Scrape Creators | GET | `https://mpp.orthogonal.com/scrapecreators/v1/twitter/profile?handle=${handle}` | routed MPP | $0.021 |
-| 6 | X/Twitter recent tweets — Scrape Creators | GET | `https://mpp.orthogonal.com/scrapecreators/v1/twitter/user-tweets?handle=${handle}` | routed MPP | $0.021 |
 
-Full-run cap (`maxAmount`): **$0.50**; per-step cap **$0.05**. Live total ≈ $0.10.
+Full-run cap (`maxAmount`): **$0.50**; per-step cap **$0.05**. Live total ≈ $0.06.
 
 ## Rails & providers
 
@@ -41,7 +39,7 @@ selat-pay POST "https://parallelmpp.dev/api/search" \
 # MPP (GET query)
 selat-pay GET "https://mpp.orthogonal.com/scrapecreators/v1/reddit/search?query=usdc" \
   --chain base --probe-only
-selat-pay GET "https://mpp.orthogonal.com/scrapecreators/v1/twitter/profile?handle=OpenAI" \
+selat-pay GET "https://mpp.orthogonal.com/scrapecreators/v1/reddit/subreddit?subreddit=ethereum" \
   --chain base --probe-only
 ```
 

@@ -1,6 +1,6 @@
 ---
 name: social-intel
-description: Use this skill when the user wants a cross-platform read on what people are saying about a topic, brand, or product — e.g. "what's the social sentiment on <topic>", "scan Reddit for <topic>", "social listening on <brand>", "is <topic> trending", "pull chatter + web context on <topic>", "brand/topic intelligence brief". Fuses Reddit signal (StableSocial, routed MPP) with grounded web context (Exa + Parallel). Pays per call via selat-pay (USDC), no API keys.
+description: Use this skill when the user wants a grounded, corroborated web read on a topic, brand, or product — e.g. "what's being said about <topic>", "give me a web brief on <brand>", "is <topic> trending", "pull grounded web context on <topic>", "topic/brand intelligence brief with citations". Runs two independent web searches (Exa neural + Tavily advanced) and fuses them into one cited brief. Pays per call via selat-pay (USDC on Base), no API keys.
 license: Apache-2.0
 compatibility: Requires the selat CLI, selat-pay >= 0.7.0, and a funded Circle Agent Wallet on Base. The routed steps need a reachable SELAT Router (SELAT_ROUTER_URL); `selat skill verify` (no --pay) is free and needs no funded wallet.
 metadata:
@@ -12,27 +12,26 @@ metadata:
 
 # social-intel
 
-Cross-platform social intelligence on any topic, brand, or account. The skill
-gathers paid signal over both x402 protocols — **web search + Reddit routed via the
-SELAT Router (x402 + MPP)** — and the agent fuses it into
-a brief — what the web says and what Reddit says — with citations.
+Grounded web-context intelligence on any topic, brand, or account. The skill runs
+**two independent web searches — Exa (neural) and Tavily (advanced) — both routed
+via the SELAT Router (x402)** — and the agent fuses them into a single cited brief,
+cross-checking the two sources and flagging claims only one of them makes.
 
 ## When To Use
 
-Use when the user wants social listening or a topic/brand intelligence
-brief that spans more than one source: Reddit community chatter plus grounded
-web context to corroborate. Pick
-this over a single-source skill (e.g. `reddit-pulse`)
-when the value is in *fusing* signals across platforms and rails. Every API call
-is a paid x402 service; the agent does the ranking, sentiment read, and synthesis
-around the paid data.
+Use when the user wants a grounded, corroborated web read on a topic, brand, or
+product — not a single-source lookup. The value is in *cross-checking two distinct
+retrieval methods* (Exa's neural/semantic search vs Tavily's aggregation) so the
+brief is corroborated rather than dependent on one engine. Every API call is a paid
+x402 service; the agent does the ranking, sentiment read, and synthesis around the
+paid data.
 
 ## Rails
 
-This skill spans both x402 protocols, both **routed** through the SELAT Router:
+Both steps are native x402, **routed** through the SELAT Router (`rail: routed`):
 
-- **routed x402**: Exa web search — resolves as `routed-x402`.
-- **routed MPP**: Parallel web search + StableSocial (Reddit) — resolve as `routed-mpp`.
+- **routed x402**: Exa web search (`api.exa.ai`) — resolves as `routed-x402`.
+- **routed x402**: Tavily web search (`x402.tavily.com`) — resolves as `routed-x402`.
 
 The `selat` CLI auto-detects each step's protocol at call time.
 
@@ -40,47 +39,40 @@ The `selat` CLI auto-detects each step's protocol at call time.
 
 1. Install: `selat skill install social-intel`
 2. Run end-to-end:
-   `selat skill run social-intel --topic "<topic>" --subreddit <subreddit>`
+   `selat skill run social-intel --topic "<topic>"`
 3. The CLI compiles each step into a `selat-pay` call and prints each result.
 
-Recommended agent procedure (cheapest-first; stop early when a side is conclusive):
+Recommended agent procedure:
 
-1. **Ground the topic on the web** — Exa `POST /search` (routed x402, ~$0.007).
-2. **Corroborate the web read** — Parallel `POST /api/search` (routed MPP, ~$0.011).
-   Cross-reference against Exa; flag claims only one source makes.
-3. **Read the Reddit conversation** — StableSocial `POST /api/reddit/search`
-   (routed MPP, ~$0.063); rank hits by engagement.
-4. **Add community context** — StableSocial `POST /api/reddit/subreddit`
-   (routed MPP, ~$0.063) for the named subreddit's current top posts.
+1. **Ground the topic on the web** — Exa `POST /search` (routed x402, ~$0.007);
+   returns ranked results with page text.
+2. **Corroborate the web read** — Tavily `POST /search` (routed x402, ~$0.011),
+   `search_depth: advanced`. Cross-reference against Exa; flag claims only one
+   source makes, and prefer sources both engines surface.
 
-Then synthesize: a sentiment read, the dominant themes, the breakout
-post/thread per source, and where the web context confirms or contradicts the
-social chatter — with source URLs.
+Then synthesize: the dominant themes, the strongest sources, and where the two
+engines agree or diverge — with source URLs.
 
 ## Inputs And Outputs
 
 | Param | Required | Default | Description |
 |---|---|---|---|
-| `topic` | yes | `agent payments` | Keyword/topic to listen for (web + Reddit search). |
-| `subreddit` | no | `ethereum` | Subreddit (no `r/`) to scan top posts of. |
+| `topic` | yes | `agent payments` | Keyword/topic to search the web for (both engines). |
 
-Output: per-step JSON (web results with text snippets + URLs, and Reddit posts
-with scores/comments) that the agent fuses into a cross-platform intelligence
-brief.
+Output: per-step JSON (Exa results with page-text snippets + URLs; Tavily results
+with snippets + URLs) that the agent fuses into a single corroborated web brief
+with citations.
 
 ## Gotchas
 
-- **Two protocols, both routed.** Exa settles `routed-x402`; Parallel and the
-  StableSocial (Reddit) steps settle `routed-mpp` — all through the SELAT Router,
-  so a reachable `SELAT_ROUTER_URL` is required for every step.
-- **POST params in `body`.** Exa/Parallel and the StableSocial (Reddit) steps are
-  all POST — the query/subreddit goes in the body, not the URL.
-- **`maxAmount` is a guardrail, not the price.** Per-step caps are `$0.05`
-  (web steps) and `$0.20` (the StableSocial Reddit steps); live quotes
-  (probe-verified 2026-07-10): Exa ~$0.007, Parallel ~$0.011, each StableSocial
-  Reddit call ~$0.063. The full-run cap is `$0.50`.
-- **Pass `--subreddit`** to retarget the Reddit-community step;
-  the topic-search steps (Exa, Parallel, Reddit search) key off `--topic`.
+- **Two engines, both routed x402.** Exa and Tavily both settle `routed-x402`
+  through the SELAT Router, so a reachable `SELAT_ROUTER_URL` is required for both.
+- **Both steps are POST** — the query goes in the request `body`, not the URL.
+- **`maxAmount` is a guardrail, not the price.** Per-step cap is `$0.05` (live
+  quotes: Exa ~$0.007, Tavily ~$0.011); the full-run cap is `$0.10`.
+- **Corroboration, not coverage.** Two engines exist to cross-check each other, not
+  to maximize raw recall — prefer sources both surface; treat single-source claims
+  as weaker.
 - **The live 402 is the source of truth.** If a step stops serving a challenge,
   `selat skill verify` flags it — omit it and re-add when the gateway serves it.
 
@@ -89,7 +81,7 @@ brief.
 > `--chain base` in the probe commands below is only the flag `selat-pay` requires today — a probe reads a free, chain-independent quote and never settles. A real paid run resolves the settlement chain from your funded Circle Gateway balance, not the manifest.
 
 - Static: `selat skill validate ./skills-scaffold/social-intel`
-- Live gate (free): `selat skill verify ./skills-scaffold/social-intel --topic "agent payments" --subreddit ethereum`
+- Live gate (free): `selat skill verify ./skills-scaffold/social-intel --topic "agent payments"`
 - Paid confirm (settles real 200s): add `--pay` to the verify command.
 - Single-step probe (no pay):
   `selat-pay POST "https://api.exa.ai/search" --body '{"query":"agent payments","numResults":5}' --chain base --probe-only`

@@ -1,6 +1,6 @@
 ---
 name: social-intel
-description: Use this skill when the user wants a cross-platform read on what people are saying about a topic, brand, or product — e.g. "what's the social sentiment on <topic>", "scan Reddit for <topic>", "social listening on <brand>", "is <topic> trending", "pull chatter + web context on <topic>", "brand/topic intelligence brief". Fuses Reddit signal (Scrape Creators, MPP) with grounded web context (Exa + Parallel) — all routed via the SELAT Router. Pays per call via selat-pay (USDC on Base), no API keys.
+description: Use this skill when the user wants a cross-platform read on what people are saying about a topic, brand, or product — e.g. "what's the social sentiment on <topic>", "scan Reddit for <topic>", "social listening on <brand>", "is <topic> trending", "pull chatter + web context on <topic>", "brand/topic intelligence brief". Fuses Reddit signal (StableSocial, routed MPP) with grounded web context (Exa + Parallel). Pays per call via selat-pay (USDC), no API keys.
 license: Apache-2.0
 compatibility: Requires the selat CLI, selat-pay >= 0.7.0, and a funded Circle Agent Wallet on Base. The routed steps need a reachable SELAT Router (SELAT_ROUTER_URL); `selat skill verify` (no --pay) is free and needs no funded wallet.
 metadata:
@@ -13,8 +13,8 @@ metadata:
 # social-intel
 
 Cross-platform social intelligence on any topic, brand, or account. The skill
-gathers paid signal over **two x402 protocols (x402 + MPP), both routed via the
-SELAT Router**, and the agent fuses it into
+gathers paid signal over both x402 protocols — **web search + Reddit routed via the
+SELAT Router (x402 + MPP)** — and the agent fuses it into
 a brief — what the web says and what Reddit says — with citations.
 
 ## When To Use
@@ -29,11 +29,10 @@ around the paid data.
 
 ## Rails
 
-This skill spans **two x402 protocols**, both **routed** through the SELAT Router
-(`rail: routed`):
+This skill spans both x402 protocols, both **routed** through the SELAT Router:
 
-- **x402**: Exa web search — resolves as `routed-x402` on Base.
-- **MPP**: Parallel web search + Scrape Creators (Reddit) — resolve as `routed-mpp`.
+- **routed x402**: Exa web search — resolves as `routed-x402`.
+- **routed MPP**: Parallel web search + StableSocial (Reddit) — resolve as `routed-mpp`.
 
 The `selat` CLI auto-detects each step's protocol at call time.
 
@@ -49,10 +48,10 @@ Recommended agent procedure (cheapest-first; stop early when a side is conclusiv
 1. **Ground the topic on the web** — Exa `POST /search` (routed x402, ~$0.007).
 2. **Corroborate the web read** — Parallel `POST /api/search` (routed MPP, ~$0.011).
    Cross-reference against Exa; flag claims only one source makes.
-3. **Read the Reddit conversation** — Scrape Creators `GET /v1/reddit/search`
-   (routed MPP, ~$0.021); rank hits by engagement.
-4. **Add community context** — Scrape Creators `GET /v1/reddit/subreddit`
-   (routed MPP, ~$0.021) for the named subreddit's current top posts.
+3. **Read the Reddit conversation** — StableSocial `POST /api/reddit/search`
+   (routed MPP, ~$0.063); rank hits by engagement.
+4. **Add community context** — StableSocial `POST /api/reddit/subreddit`
+   (routed MPP, ~$0.063) for the named subreddit's current top posts.
 
 Then synthesize: a sentiment read, the dominant themes, the breakout
 post/thread per source, and where the web context confirms or contradicts the
@@ -72,14 +71,14 @@ brief.
 ## Gotchas
 
 - **Two protocols, both routed.** Exa settles `routed-x402`; Parallel and the
-  Scrape Creators steps settle `routed-mpp` — all through the SELAT Router, so a
-  reachable `SELAT_ROUTER_URL` is required for every step.
-- **GET params in the query, POST params in `body`.** Exa/Parallel are POST — their
-  query goes in the body; the Scrape Creators steps are GET — `?query=`/
-  `?subreddit=` in the URL.
-- **`maxAmount` is a guardrail, not the price.** Per-step cap is `$0.05` (live
-  quotes: Exa ~$0.007, Parallel ~$0.011, each Scrape Creators call ~$0.021); the
-  full-run cap is `$0.50`.
+  StableSocial (Reddit) steps settle `routed-mpp` — all through the SELAT Router,
+  so a reachable `SELAT_ROUTER_URL` is required for every step.
+- **POST params in `body`.** Exa/Parallel and the StableSocial (Reddit) steps are
+  all POST — the query/subreddit goes in the body, not the URL.
+- **`maxAmount` is a guardrail, not the price.** Per-step caps are `$0.05`
+  (web steps) and `$0.20` (the StableSocial Reddit steps); live quotes
+  (probe-verified 2026-07-10): Exa ~$0.007, Parallel ~$0.011, each StableSocial
+  Reddit call ~$0.063. The full-run cap is `$0.50`.
 - **Pass `--subreddit`** to retarget the Reddit-community step;
   the topic-search steps (Exa, Parallel, Reddit search) key off `--topic`.
 - **The live 402 is the source of truth.** If a step stops serving a challenge,

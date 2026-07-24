@@ -1,31 +1,29 @@
 # Endpoints — social-intel
 
-Cross-platform social intelligence over **two x402 protocols** from the SELAT
-federated catalogue (Agentic Market / MPP), **both routed** through the SELAT
-Router: x402 web search + MPP social scraping, paid per call via selat-pay (USDC
-on Base), no API keys.
+Cross-platform social intelligence over the SELAT federated catalogues. Web search
+and Reddit are **routed** through the SELAT Router (x402 + MPP). Paid per call via
+selat-pay (USDC), no API keys.
 
 ## Endpoints used
 
 | # | Step | Method | URL | Rail | ~Price |
 |---|---|---|---|---|---|
-| 1 | Web context — Exa | POST | `https://api.exa.ai/search` | routed x402 (Base) | $0.007 |
+| 1 | Web context — Exa | POST | `https://api.exa.ai/search` | routed x402 | $0.007 |
 | 2 | Web corroboration — Parallel | POST | `https://parallelmpp.dev/api/search` | routed MPP | $0.011 |
-| 3 | Reddit keyword search — Scrape Creators | GET | `https://mpp.orthogonal.com/scrapecreators/v1/reddit/search?query=${topic}` | routed MPP | $0.021 |
-| 4 | Reddit subreddit top posts — Scrape Creators | GET | `https://mpp.orthogonal.com/scrapecreators/v1/reddit/subreddit?subreddit=${subreddit}` | routed MPP | $0.021 |
+| 3 | Reddit keyword search — StableSocial | POST | `https://stablesocial.dev/api/reddit/search` (body `{"query":"${topic}"}`) | routed MPP | $0.063 |
+| 4 | Reddit subreddit top posts — StableSocial | POST | `https://stablesocial.dev/api/reddit/subreddit` (body `{"subreddit":"${subreddit}"}`) | routed MPP | $0.063 |
 
-Full-run cap (`maxAmount`): **$0.50**; per-step cap **$0.05**. Live total ≈ $0.06.
+Full-run cap (`maxAmount`): **$0.50**; per-step caps **$0.05** (web) and
+**$0.20** (StableSocial Reddit steps). Live total ≈ $0.14 (prices probe-verified
+2026-07-10).
 
 ## Rails & providers
 
-Both protocols settle **routed** through the SELAT Router.
-
 - **routed x402** — Exa (`api.exa.ai`) serves a native x402 challenge; the router
-  settles it on Base (`mode=routed-x402`). Sourced from the Agentic Market / MPP catalogs.
-- **routed MPP** — Parallel (`parallelmpp.dev`) and Scrape Creators (wired at its
-  MPP gateway `serviceUrl` `mpp.orthogonal.com/scrapecreators/...`, **not** the
-  provider host `api.scrapecreators.com`) settle MPP through the SELAT Router
-  (`mode=routed-mpp`). Sourced from the MPP catalog.
+  settles it (`mode=routed-x402`). Sourced from the Agentic Market / MPP catalogs.
+- **routed MPP** — Parallel (`parallelmpp.dev`) and StableSocial (Reddit,
+  a direct MPP merchant at `stablesocial.dev/api/reddit/...`) settle MPP through
+  the SELAT Router (`mode=routed-mpp`). Sourced from the MPP catalog.
 
 ## Live probes (free; no wallet)
 
@@ -36,12 +34,13 @@ selat-pay POST "https://api.exa.ai/search" \
 selat-pay POST "https://parallelmpp.dev/api/search" \
   --body '{"objective":"agent payments","search_queries":["agent payments"]}' --chain base --probe-only
 
-# MPP (GET query)
-selat-pay GET "https://mpp.orthogonal.com/scrapecreators/v1/reddit/search?query=usdc" \
-  --chain base --probe-only
-selat-pay GET "https://mpp.orthogonal.com/scrapecreators/v1/reddit/subreddit?subreddit=ethereum" \
-  --chain base --probe-only
+# Reddit — StableSocial, routed MPP (POST body)
+selat-pay POST "https://stablesocial.dev/api/reddit/search" \
+  --body '{"query":"usdc"}' --chain base --probe-only
+selat-pay POST "https://stablesocial.dev/api/reddit/subreddit" \
+  --body '{"subreddit":"ethereum"}' --chain base --probe-only
 ```
 
-A served endpoint prints `detected ... price=$X on eip155:8453`. The web steps show
-`mode=routed-x402`; the Scrape Creators steps show `mode=routed-mpp`.
+A served endpoint prints `detected ... price=$X on eip155:8453`. The Exa step shows
+`mode=routed-x402`; Parallel and the StableSocial (Reddit) steps show
+`mode=routed-mpp`.

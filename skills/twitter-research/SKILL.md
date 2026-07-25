@@ -81,7 +81,15 @@ tweet-reception breakdown, topic chatter, or trend list — whichever was asked)
 - **`tweets` takes `tweet_ids` (plural), the reply/retweeter reads take
   `tweet_id`.** Same value, different query key — already wired in the manifest.
 - **`woeid` is a Yahoo Where-On-Earth ID, not a country code** (`1` = worldwide).
-- **Handles have no leading `@`.** Strip it before passing `handle`.
+- **Handles have no leading `@`.** Strip it before passing `handle` (the API param
+  is `userName`; the manifest maps `${handle}` → `userName=`).
+- **`tweets` batches — `tweet_ids` is comma-separated** (`20,21,22`). The manifest
+  passes one id; hand-build the call for a batch.
+- **Paginate via `cursor`.** `last_tweets`, `mentions`, `followers`, and the
+  reply/retweeter reads return a `cursor`; to fetch the next page, issue a
+  hand-built `selat-pay GET …&cursor=<token>` — each page is another ~$0.001.
+  `cursor` is not a manifest param. Full per-param schema (pinned from
+  `catalog.selat.ai/twitter/openapi.json`) is in `references/endpoints.md`.
 - **All steps need the SELAT Router.** `catalog.selat.ai` settles x402 via Circle
   Gateway *through* the SELAT Router, so `SELAT_ROUTER_URL` must be reachable.
 - **Read-only + public-only.** No posting/engagement; protected accounts error.

@@ -4,8 +4,8 @@
   "method": "selat-pay --probe-only (free live-402 quote; no paid call)",
   "router": "https://router.selat.ai",
   "summary": {
-    "skills": 18,
-    "ok": 16,
+    "skills": 17,
+    "ok": 15,
     "degraded": 2,
     "down": 0
   },
@@ -1401,40 +1401,6 @@
           "withinCap": false,
           "latencyMs": 3189,
           "error": "Cannot convert 0.016 to a BigInt"
-        }
-      ]
-    },
-    {
-      "name": "twitter-profile-lookup",
-      "rail": "x402 via Circle Gateway",
-      "status": "ok",
-      "checkedAt": "2026-07-25T21:16:31.971Z",
-      "steps": [
-        {
-          "label": "profile — SELAT Twitter API (x402 via Circle Gateway)",
-          "rail": "x402 via Circle Gateway",
-          "method": "GET",
-          "maxAmount": 0.1,
-          "url": "https://catalog.selat.ai/twitter/user/info?userName=openai",
-          "mode": "direct",
-          "reachable": true,
-          "livePriceUsd": 0.001,
-          "withinCap": true,
-          "latencyMs": 643,
-          "error": null
-        },
-        {
-          "label": "recent tweets — SELAT Twitter API (x402 via Circle Gateway)",
-          "rail": "x402 via Circle Gateway",
-          "method": "GET",
-          "maxAmount": 0.1,
-          "url": "https://catalog.selat.ai/twitter/user/last_tweets?userName=openai",
-          "mode": "direct",
-          "reachable": true,
-          "livePriceUsd": 0.001,
-          "withinCap": true,
-          "latencyMs": 583,
-          "error": null
         }
       ]
     },

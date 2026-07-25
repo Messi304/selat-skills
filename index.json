@@ -62,12 +62,6 @@
       "description": "Find Twitter/X influencers (Scrape Creators, Fiber, Exa, Brand.dev, Hunter, Tomba). Paid per call via x402 + MPP."
     },
     {
-      "name": "twitter-profile-lookup",
-      "rail": "x402 via Circle Gateway",
-      "kind": "single",
-      "description": "Twitter/X profile + recent tweets via Scrape Creators. Paid per call via x402."
-    },
-    {
       "name": "scrapecreators",
       "rail": "mixed",
       "kind": "multi",

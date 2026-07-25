@@ -4,8 +4,8 @@
   "method": "selat-pay --probe-only (free live-402 quote; no paid call)",
   "router": "https://router.selat.ai",
   "summary": {
-    "skills": 18,
-    "ok": 16,
+    "skills": 17,
+    "ok": 15,
     "degraded": 2,
     "down": 0
   },
@@ -623,105 +623,6 @@
           "livePriceUsd": 0.0084,
           "withinCap": true,
           "latencyMs": 1000,
-          "error": null
-        }
-      ]
-    },
-    {
-      "name": "fifa-stadium-hotel-planner",
-      "rail": "routed",
-      "status": "ok",
-      "checkedAt": "2026-07-25T13:24:27.900Z",
-      "steps": [
-        {
-          "label": "FIFA match and trip bundle - Fanfare (routed x402)",
-          "rail": "routed",
-          "method": "GET",
-          "maxAmount": 0.3,
-          "url": "https://fanfare.run/v1/world-cup-bundle?date=2026-07-19&team=&origin=SFO&check_in=2026-07-18&check_out=2026-07-20&passengers=1&guests=1",
-          "mode": "routed-x402",
-          "reachable": true,
-          "livePriceUsd": 0.2625,
-          "withinCap": true,
-          "latencyMs": 916,
-          "error": null
-        },
-        {
-          "label": "hotel candidates with coordinates — Google Maps (MPP/Tempo, ROUTED via SELAT Router)",
-          "rail": "routed",
-          "method": "GET",
-          "maxAmount": 0.11,
-          "url": "https://googlemaps.mpp.tempo.xyz/maps/place/textsearch/json?query=hotels%20near%20MetLife%20Stadium%20East%20Rutherford%20NJ",
-          "mode": "routed-mpp",
-          "reachable": true,
-          "livePriceUsd": 0.0336,
-          "withinCap": true,
-          "latencyMs": 763,
-          "error": null
-        },
-        {
-          "label": "hotel place details — Google Maps (MPP/Tempo, ROUTED via SELAT Router)",
-          "rail": "routed",
-          "method": "GET",
-          "maxAmount": 0.06,
-          "url": "https://googlemaps.mpp.tempo.xyz/maps/place/details/json?place_id=",
-          "mode": "routed-mpp",
-          "reachable": true,
-          "livePriceUsd": 0.01785,
-          "withinCap": true,
-          "latencyMs": 660,
-          "error": null
-        },
-        {
-          "label": "selected hotel reviews — Google Maps (MPP/Tempo, ROUTED via SELAT Router)",
-          "rail": "routed",
-          "method": "GET",
-          "maxAmount": 0.06,
-          "url": "https://googlemaps.mpp.tempo.xyz/maps/place/details/json?place_id=&fields=name,rating,reviews",
-          "mode": "routed-mpp",
-          "reachable": true,
-          "livePriceUsd": 0.01785,
-          "withinCap": true,
-          "latencyMs": 657,
-          "error": null
-        },
-        {
-          "label": "lodging near stadium - Google Places Nearby Search (routed MPP)",
-          "rail": "routed",
-          "method": "GET",
-          "maxAmount": 0.05,
-          "url": "https://googlemaps.mpp.tempo.xyz/maps/place/nearbysearch/json?location=40.8135,-74.0745&radius=5000&keyword=hotel&type=lodging",
-          "mode": "routed-mpp",
-          "reachable": true,
-          "livePriceUsd": 0.0336,
-          "withinCap": true,
-          "latencyMs": 655,
-          "error": null
-        },
-        {
-          "label": "stadium to hotel walking distance - Google Maps Distance Matrix (routed MPP)",
-          "rail": "routed",
-          "method": "GET",
-          "maxAmount": 0.05,
-          "url": "https://googlemaps.mpp.tempo.xyz/maps/distancematrix/json?origins=40.8135,-74.0745&destinations=40.7892,-74.0555&mode=walking&units=imperial",
-          "mode": "routed-mpp",
-          "reachable": true,
-          "livePriceUsd": 0.00525,
-          "withinCap": true,
-          "latencyMs": 664,
-          "error": null
-        },
-        {
-          "label": "stadium and selected hotel pin map - Google Static Maps (routed MPP)",
-          "rail": "routed",
-          "method": "GET",
-          "maxAmount": 0.05,
-          "url": "https://googlemaps.mpp.tempo.xyz/maps/staticmap?center=40.8135,-74.0745&zoom=13&size=900x650&markers=color:red%7Clabel:S%7C40.8135,-74.0745&markers=color:blue%7Clabel:H%7C40.7892,-74.0555",
-          "mode": "routed-mpp",
-          "reachable": true,
-          "livePriceUsd": 0.0021,
-          "withinCap": true,
-          "latencyMs": 629,
           "error": null
         }
       ]

@@ -27,17 +27,17 @@
   },
   "steps": [
     {
-      "label": "X/Twitter profile — AIsa Twitter API (Circle x402 catalog; DIRECT, Circle Gateway-batched)",
-      "rail": "direct",
+      "label": "X/Twitter profile — SELAT Twitter API (catalog.selat.ai; ROUTED via SELAT Router, Circle Gateway-batched)",
+      "rail": "routed",
       "method": "GET",
-      "url": "https://api.aisa.one/apis/v2/twitter/user/info?userName=${handle}",
+      "url": "https://catalog.selat.ai/twitter/user/info?userName=${handle}",
       "maxAmount": "0.05"
     },
     {
-      "label": "X/Twitter recent tweets — AIsa Twitter API (Circle x402 catalog; DIRECT, Circle Gateway-batched)",
-      "rail": "direct",
+      "label": "X/Twitter recent tweets — SELAT Twitter API (catalog.selat.ai; ROUTED via SELAT Router, Circle Gateway-batched)",
+      "rail": "routed",
       "method": "GET",
-      "url": "https://api.aisa.one/apis/v2/twitter/user/last_tweets?userName=${handle}",
+      "url": "https://catalog.selat.ai/twitter/user/last_tweets?userName=${handle}",
       "maxAmount": "0.05"
     },
     {
@@ -52,7 +52,9 @@
       "rail": "routed",
       "method": "POST",
       "url": "https://brave.mpp.paywithlocus.com/brave/news-search",
-      "body": { "q": "${name}" },
+      "body": {
+        "q": "${name}"
+      },
       "maxAmount": "0.06"
     },
     {
@@ -63,7 +65,11 @@
       "body": {
         "query": "${name}",
         "numResults": 8,
-        "contents": { "text": { "maxCharacters": 3000 } }
+        "contents": {
+          "text": {
+            "maxCharacters": 3000
+          }
+        }
       },
       "maxAmount": "0.05"
     },

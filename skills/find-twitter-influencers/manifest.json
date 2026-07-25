@@ -1,7 +1,7 @@
 {
   "schema": "selat-skill/v1",
   "name": "find-twitter-influencers",
-  "description": "Discover, score, and enrich Twitter/X influencers for a company or niche. Resolves the company (Apollo org search, Abstract Company Enrichment), discovers curated listicles (Exa), pulls Twitter profiles and engagement (AIsa, Circle x402 catalog), and enriches contacts (Hunter, Clado). Mixed rail: most steps are MPP-routed via the SELAT Router; the AIsa Twitter steps are direct Circle x402 calls.",
+  "description": "Discover, score, and enrich Twitter/X influencers for a company or niche. Resolves the company (Apollo org search, Abstract Company Enrichment), discovers curated listicles (Exa), pulls Twitter profiles and engagement (SELAT-native, Circle x402 catalog), and enriches contacts (Hunter, Clado). Mixed rail: most steps are MPP-routed via the SELAT Router; the SELAT-native Twitter steps are routed x402 calls via the SELAT Router.",
   "maxAmount": "0.50",
   "params": {
     "company": {
@@ -27,7 +27,7 @@
     "handle": {
       "required": false,
       "default": "examplehandle",
-      "description": "Twitter/X handle (no @) to fetch a profile and recent tweets for (AIsa userName query param)."
+      "description": "Twitter/X handle (no @) to fetch a profile and recent tweets for (SELAT-native userName query param)."
     },
     "linkedinUrl": {
       "required": false,
@@ -104,17 +104,17 @@
       "maxAmount": "0.10"
     },
     {
-      "label": "fetch Twitter profile + counts — AIsa Twitter API (Circle x402 catalog; DIRECT, Circle Gateway-batched)",
-      "rail": "direct",
+      "label": "fetch Twitter profile + counts — SELAT Twitter API (catalog.selat.ai; ROUTED via SELAT Router, Circle Gateway-batched)",
+      "rail": "routed",
       "method": "GET",
-      "url": "https://api.aisa.one/apis/v2/twitter/user/info?userName=${handle}",
+      "url": "https://catalog.selat.ai/twitter/user/info?userName=${handle}",
       "maxAmount": "0.10"
     },
     {
-      "label": "fetch top tweets + engagement — AIsa Twitter API (Circle x402 catalog; DIRECT, Circle Gateway-batched)",
-      "rail": "direct",
+      "label": "fetch top tweets + engagement — SELAT Twitter API (catalog.selat.ai; ROUTED via SELAT Router, Circle Gateway-batched)",
+      "rail": "routed",
       "method": "GET",
-      "url": "https://api.aisa.one/apis/v2/twitter/user/last_tweets?userName=${handle}",
+      "url": "https://catalog.selat.ai/twitter/user/last_tweets?userName=${handle}",
       "maxAmount": "0.10"
     },
     {

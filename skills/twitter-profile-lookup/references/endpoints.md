@@ -4,5 +4,5 @@ Every endpoint below is probe-verified live-payable as a direct x402 call (Circl
 
 | Merchant | Endpoint | Live price |
 |---|---|---|
-| AIsa | `GET api.aisa.one/apis/v2/twitter/user/info?userName=${handle}` | $0.00044 |
-| AIsa | `GET api.aisa.one/apis/v2/twitter/user/last_tweets?userName=${handle}` | $0.0036 |
+| SELAT-native | `GET catalog.selat.ai/twitter/user/info?userName=${handle}` | $0.001 |
+| SELAT-native | `GET catalog.selat.ai/twitter/user/last_tweets?userName=${handle}` | $0.001 |

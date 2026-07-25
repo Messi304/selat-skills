@@ -1,7 +1,7 @@
 {
   "schema": "selat-skill/v1",
   "name": "scrapecreators",
-  "description": "Multi-merchant social media scraping across AIsa (X/Twitter — Circle x402 catalog, DIRECT, Circle Gateway-batched), StableSocial (Instagram + TikTok — MPP, ROUTED via the SELAT Router), and Clado (LinkedIn — MPP, ROUTED): profiles, tweets, posts, company pages, and hashtag/keyword searches. Mixed rail; each capability is compiled into a selat-pay call by the selat CLI.",
+  "description": "Multi-merchant social media scraping across SELAT-native (X/Twitter — catalog.selat.ai, ROUTED via SELAT Router, Circle Gateway-batched), StableSocial (Instagram + TikTok — MPP, ROUTED via the SELAT Router), and Clado (LinkedIn — MPP, ROUTED): profiles, tweets, posts, company pages, and hashtag/keyword searches. Mixed rail; each capability is compiled into a selat-pay call by the selat CLI.",
   "maxAmount": "0.75",
   "params": {
     "handle": {
@@ -12,7 +12,7 @@
     "tweetId": {
       "required": false,
       "default": "1234567890123456789",
-      "description": "Numeric tweet ID for the X/Twitter tweet-details lookup (AIsa takes tweet IDs, not tweet URLs)."
+      "description": "Numeric tweet ID for the X/Twitter tweet-details lookup (catalog.selat.ai takes tweet IDs, not tweet URLs)."
     },
     "linkedinUrl": {
       "required": false,
@@ -42,24 +42,24 @@
   },
   "steps": [
     {
-      "label": "X/Twitter profile — AIsa Twitter API (Circle x402 catalog; DIRECT, Circle Gateway-batched)",
-      "rail": "direct",
+      "label": "X/Twitter profile — SELAT Twitter API (catalog.selat.ai; ROUTED via SELAT Router, Circle Gateway-batched)",
+      "rail": "routed",
       "method": "GET",
-      "url": "https://api.aisa.one/apis/v2/twitter/user/info?userName=${handle}",
+      "url": "https://catalog.selat.ai/twitter/user/info?userName=${handle}",
       "maxAmount": "0.10"
     },
     {
-      "label": "X/Twitter user tweets — AIsa Twitter API (Circle x402 catalog; DIRECT, Circle Gateway-batched)",
-      "rail": "direct",
+      "label": "X/Twitter user tweets — SELAT Twitter API (catalog.selat.ai; ROUTED via SELAT Router, Circle Gateway-batched)",
+      "rail": "routed",
       "method": "GET",
-      "url": "https://api.aisa.one/apis/v2/twitter/user/last_tweets?userName=${handle}",
+      "url": "https://catalog.selat.ai/twitter/user/last_tweets?userName=${handle}",
       "maxAmount": "0.10"
     },
     {
-      "label": "X/Twitter tweet details — AIsa Twitter API (Circle x402 catalog; DIRECT, Circle Gateway-batched)",
-      "rail": "direct",
+      "label": "X/Twitter tweet details — SELAT Twitter API (catalog.selat.ai; ROUTED via SELAT Router, Circle Gateway-batched)",
+      "rail": "routed",
       "method": "GET",
-      "url": "https://api.aisa.one/apis/v2/twitter/tweets?tweet_ids=${tweetId}",
+      "url": "https://catalog.selat.ai/twitter/tweets?tweet_ids=${tweetId}",
       "maxAmount": "0.10"
     },
     {

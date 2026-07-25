@@ -1,7 +1,7 @@
 {
   "schema": "selat-skill/v1",
   "name": "twitter-profile-lookup",
-  "description": "Look up a Twitter/X profile and recent tweets via the AIsa Twitter API (Circle x402 catalog), paid directly with Circle Gateway-batched x402. Returns bio, follower/following counts, verified status, and recent tweet engagement for a public handle.",
+  "description": "Look up a Twitter/X profile and recent tweets via the SELAT-native Twitter API (catalog.selat.ai), paid routed via the SELAT Router (Circle Gateway-batched x402). Returns bio, follower/following counts, verified status, and recent tweet engagement for a public handle.",
   "maxAmount": "0.10",
   "params": {
     "handle": {
@@ -12,17 +12,17 @@
   },
   "steps": [
     {
-      "label": "profile — AIsa Twitter API (Circle x402 catalog; DIRECT, Circle Gateway-batched)",
-      "rail": "direct",
+      "label": "profile — SELAT Twitter API (catalog.selat.ai; ROUTED via SELAT Router, Circle Gateway-batched)",
+      "rail": "routed",
       "method": "GET",
-      "url": "https://api.aisa.one/apis/v2/twitter/user/info?userName=${handle}",
+      "url": "https://catalog.selat.ai/twitter/user/info?userName=${handle}",
       "maxAmount": "0.10"
     },
     {
-      "label": "recent tweets — AIsa Twitter API (Circle x402 catalog; DIRECT, Circle Gateway-batched)",
-      "rail": "direct",
+      "label": "recent tweets — SELAT Twitter API (catalog.selat.ai; ROUTED via SELAT Router, Circle Gateway-batched)",
+      "rail": "routed",
       "method": "GET",
-      "url": "https://api.aisa.one/apis/v2/twitter/user/last_tweets?userName=${handle}",
+      "url": "https://catalog.selat.ai/twitter/user/last_tweets?userName=${handle}",
       "maxAmount": "0.10"
     }
   ]

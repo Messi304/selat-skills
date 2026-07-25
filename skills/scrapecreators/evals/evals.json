@@ -4,10 +4,10 @@
     {
       "id": "twitter-profile",
       "prompt": "Scrape the X/Twitter profile for the handle openai.",
-      "expected_output": "The skill runs the direct AIsa twitter user-info step and returns the profile JSON (bio, follower counts).",
+      "expected_output": "The skill runs the routed SELAT-native twitter user-info step and returns the profile JSON (bio, follower counts).",
       "assertions": [
         "The skill triggers (scrapecreators) for a social profile scrape request",
-        "The X/Twitter profile step targets https://api.aisa.one/apis/v2/twitter/user/info?userName=openai",
+        "The X/Twitter profile step targets https://catalog.selat.ai/twitter/user/info?userName=openai",
         "The step rail is direct (Circle Gateway-batched, no SELAT Router)"
       ]
     },
@@ -44,11 +44,11 @@
     {
       "id": "full-run-cap",
       "prompt": "Run the full scrapecreators skill with defaults.",
-      "expected_output": "All 12 steps run — 3 direct AIsa steps plus 9 routed StableSocial/Clado steps — and the run cost is capped at the manifest maxAmount.",
+      "expected_output": "All 12 steps run — 3 routed SELAT-native steps plus 9 routed StableSocial/Clado steps — and the run cost is capped at the manifest maxAmount.",
       "assertions": [
         "manifest.json parses as valid JSON",
         "Top-level maxAmount is 0.75 (fallback cap; live total is about 0.45)",
-        "AIsa steps are rail direct on api.aisa.one; StableSocial and Clado steps are rail routed"
+        "SELAT-native Twitter steps are rail routed via catalog.selat.ai; StableSocial and Clado steps are rail routed"
       ]
     },
     {
@@ -57,7 +57,7 @@
       "expected_output": "The scrapecreators skill does NOT trigger; this is unrelated to social media scraping.",
       "assertions": [
         "The scrapecreators skill is not selected",
-        "No AIsa, StableSocial, or Clado social-scraping endpoint is called"
+        "No SELAT-native, StableSocial, or Clado social-scraping endpoint is called"
       ]
     }
   ]

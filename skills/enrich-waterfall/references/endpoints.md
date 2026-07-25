@@ -2,7 +2,7 @@
 
 Every endpoint below is probe-verified live-payable (2026-07-10) with
 `selat-pay --probe-only`. All steps are routed over MPP via the SELAT Router
-except the AIsa step, which is a direct Circle x402 call (Circle Gateway-batched).
+including the SELAT-native step, which is a routed x402 call via the SELAT Router (Circle Gateway-batched).
 Caps (`maxAmount`) are ~10x each live price, not the live price. Live prices are the
 router quote on the probe date.
 
@@ -17,7 +17,7 @@ router quote on the probe date.
 | anchor | apollo (Locus) | `POST apollo.mpp.paywithlocus.com/apollo/org-enrichment` | $0.0084 |
 | anchor | hunter (Locus) | `POST hunter.mpp.paywithlocus.com/hunter/company-enrichment` | $0.01365 |
 | anchor | hunter (Locus) | `POST hunter.mpp.paywithlocus.com/hunter/email-finder` | $0.01365 |
-| social | aisa (Circle x402, direct) | `GET api.aisa.one/apis/v2/twitter/user/info?userName=` | $0.00044 |
+| social | selat (catalog.selat.ai, routed) | `GET catalog.selat.ai/twitter/user/info?userName=` | $0.001 |
 | social | clado (Locus) | `POST clado.mpp.paywithlocus.com/clado/scrape` | $0.02415 |
 | social | stablesocial (MPP direct merchant) | `POST stablesocial.dev/api/instagram/profile` | $0.063 |
 | social | stablesocial (MPP direct merchant) | `POST stablesocial.dev/api/tiktok/profile` | $0.063 |

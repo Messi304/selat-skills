@@ -51,7 +51,9 @@
       "url": "https://parallelmpp.dev/api/search",
       "body": {
         "objective": "${thesis} Product Hunt launches",
-        "search_queries": [ "${thesis} site:producthunt.com" ],
+        "search_queries": [
+          "${thesis} site:producthunt.com"
+        ],
         "max_results": 10
       },
       "maxAmount": "0.05"
@@ -64,22 +66,26 @@
       "body": {
         "query": "${thesis} startup launch funding",
         "numResults": 10,
-        "contents": { "text": { "maxCharacters": 3000 } }
+        "contents": {
+          "text": {
+            "maxCharacters": 3000
+          }
+        }
       },
       "maxAmount": "0.05"
     },
     {
-      "label": "Twitter/X founder & buzz search — AIsa advanced_search (direct x402, Circle registry)",
-      "rail": "direct",
+      "label": "Twitter/X founder & buzz search — SELAT advanced_search (routed x402 via SELAT Router)",
+      "rail": "routed",
       "method": "GET",
-      "url": "https://api.aisa.one/apis/v2/twitter/tweet/advanced_search?query=${twitterQuery}&queryType=Latest",
+      "url": "https://catalog.selat.ai/twitter/tweet/advanced_search?query=${twitterQuery}&queryType=Latest",
       "maxAmount": "0.05"
     },
     {
-      "label": "fundraising news on Twitter/X — AIsa advanced_search for recent pre-seed/seed raises (direct x402, Circle registry)",
-      "rail": "direct",
+      "label": "fundraising news on Twitter/X — SELAT advanced_search for recent pre-seed/seed raises (routed x402 via SELAT Router)",
+      "rail": "routed",
       "method": "GET",
-      "url": "https://api.aisa.one/apis/v2/twitter/tweet/advanced_search?query=${fundraisingQuery}&queryType=Latest",
+      "url": "https://catalog.selat.ai/twitter/tweet/advanced_search?query=${fundraisingQuery}&queryType=Latest",
       "maxAmount": "0.05"
     },
     {
@@ -96,10 +102,10 @@
       "maxAmount": "0.02"
     },
     {
-      "label": "lead-investor thesis tweets — AIsa advanced_search over the funds leading those rounds (direct x402, Circle registry)",
-      "rail": "direct",
+      "label": "lead-investor thesis tweets — SELAT advanced_search over the funds leading those rounds (routed x402 via SELAT Router)",
+      "rail": "routed",
       "method": "GET",
-      "url": "https://api.aisa.one/apis/v2/twitter/tweet/advanced_search?query=${investorQuery}&queryType=Latest",
+      "url": "https://catalog.selat.ai/twitter/tweet/advanced_search?query=${investorQuery}&queryType=Latest",
       "maxAmount": "0.05"
     },
     {
@@ -109,7 +115,12 @@
       "url": "https://apollo.mpp.paywithlocus.com/apollo/people-search",
       "body": {
         "q_keywords": "${thesis} founder",
-        "person_titles": ["Founder", "Co-Founder", "CEO", "CTO"]
+        "person_titles": [
+          "Founder",
+          "Co-Founder",
+          "CEO",
+          "CTO"
+        ]
       },
       "maxAmount": "0.05"
     },

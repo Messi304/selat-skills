@@ -1,7 +1,7 @@
 {
   "schema": "selat-skill/v1",
   "name": "enrich-waterfall",
-  "description": "Cheapest-first B2B enrichment waterfall via the SELAT Router (MPP) plus one direct Circle x402 call. Resolves a person and anchors their company with sub-cent calls first, layers in company signals / social, escalates to premium contact reveals (Clado contacts, Clado natural-language people search) only on gaps, and verifies the email last. 20 deduplicated steps across Apollo, Hunter, Clado, Brave Search, Diffbot KG and Abstract Company Enrichment (via Locus), StableSocial (MPP direct merchant), and AIsa (Circle x402 catalog).",
+  "description": "Cheapest-first B2B enrichment waterfall via the SELAT Router (MPP) plus one SELAT-native x402 call routed via the SELAT Router. Resolves a person and anchors their company with sub-cent calls first, layers in company signals / social, escalates to premium contact reveals (Clado contacts, Clado natural-language people search) only on gaps, and verifies the email last. 20 deduplicated steps across Apollo, Hunter, Clado, Brave Search, Diffbot KG and Abstract Company Enrichment (via Locus), StableSocial (MPP direct merchant), and SELAT-native (catalog.selat.ai).",
   "maxAmount": "1.00",
   "params": {
     "email": {
@@ -12,7 +12,7 @@
     "name": {
       "required": false,
       "default": "John Doe",
-      "description": "Full name; also used as the social handle for the AIsa X/Twitter profile, StableSocial Instagram/TikTok profile, and Clado handle-to-person search steps."
+      "description": "Full name; also used as the social handle for the SELAT-native X/Twitter profile, StableSocial Instagram/TikTok profile, and Clado handle-to-person search steps."
     },
     "firstName": {
       "required": false,
@@ -153,10 +153,10 @@
       "tier": "anchor"
     },
     {
-      "label": "X/Twitter profile — AIsa user info (Circle x402 catalog; DIRECT, Circle Gateway-batched)",
-      "rail": "direct",
+      "label": "X/Twitter profile — SELAT user info (catalog.selat.ai; ROUTED via SELAT Router, Circle Gateway-batched)",
+      "rail": "routed",
       "method": "GET",
-      "url": "https://api.aisa.one/apis/v2/twitter/user/info?userName=${name}",
+      "url": "https://catalog.selat.ai/twitter/user/info?userName=${name}",
       "maxAmount": "0.10",
       "tier": "social"
     },

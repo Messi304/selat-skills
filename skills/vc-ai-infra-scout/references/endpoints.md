@@ -8,19 +8,21 @@ Paid per call via selat-pay (USDC via Circle Gateway), no API keys.
 
 ## Endpoints Used
 
-| # | Step | Method | URL | Rail | Cap |
+| # | Step | Method | URL | Rail | Live price |
 |---|---|---|---|---|---|
-| 1 | Hacker News discovery - Tavily advanced search | POST | `https://x402.tavily.com/search` | x402 on Base | $0.02 |
-| 2 | Product Hunt discovery - Parallel web search | POST | `https://parallelmpp.dev/api/search` | MPP on Tempo | $0.05 |
-| 3 | Launch + web context - Exa | POST | `https://api.exa.ai/search` | MPP on Tempo | $0.05 |
+| 1 | Hacker News discovery - Tavily advanced search | POST | `https://x402.tavily.com/search` | x402 on Base | $0.0105 |
+| 2 | Product Hunt discovery - Parallel web search | POST | `https://parallelmpp.dev/api/search` | MPP on Tempo | $0.0105 |
+| 3 | Launch + web context - Exa | POST | `https://api.exa.ai/search` | MPP on Tempo | $0.00735 |
 | 4 | Twitter/X founder & buzz - SELAT-native advanced_search | GET | `https://catalog.selat.ai/twitter/tweet/advanced_search` | x402 via Circle Gateway | $0.001 |
 | 5 | Fundraising news on Twitter/X - SELAT-native advanced_search | GET | `https://catalog.selat.ai/twitter/tweet/advanced_search` | x402 via Circle Gateway | $0.001 |
-| 6 | Fundraising news on LinkedIn - Tavily advanced search | POST | `https://x402.tavily.com/search` | x402 on Base | $0.02 |
+| 6 | Fundraising news on LinkedIn - Tavily advanced search | POST | `https://x402.tavily.com/search` | x402 on Base | $0.0105 |
 | 7 | Lead-investor thesis tweets - SELAT-native advanced_search | GET | `https://catalog.selat.ai/twitter/tweet/advanced_search` | x402 via Circle Gateway | $0.001 |
-| 8 | Founder shortlist - Apollo people-search | POST | `https://apollo.mpp.paywithlocus.com/apollo/people-search` | MPP on Tempo | $0.05 |
-| 9 | Company enrichment - Apollo org-enrichment | POST | `https://apollo.mpp.paywithlocus.com/apollo/org-enrichment` | MPP on Tempo | $0.05 |
+| 8 | Founder shortlist - Apollo people-search | POST | `https://apollo.mpp.paywithlocus.com/apollo/people-search` | MPP on Tempo | $0.00525 |
+| 9 | Company enrichment - Apollo org-enrichment | POST | `https://apollo.mpp.paywithlocus.com/apollo/org-enrichment` | MPP on Tempo | $0.0084 |
 
-Full-run cap (`maxAmount`): **$0.40**. Per-step caps range **$0.02-$0.05**.
+Live prices are the routed quote (0% markup on the Circle-Gateway rail, +5% on the
+others), reconciled to fresh free-verify receipts 2026-07-26. Full-run cap
+(`maxAmount`): **$0.40**; per-step caps range **$0.02–$0.05**. Live total ≈ $0.056.
 The live 402 challenge is the source of truth for the actual price.
 
 ## Rails & Providers

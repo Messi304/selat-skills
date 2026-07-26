@@ -13,11 +13,11 @@ web (news + citations), and any associated on-chain token.
 | 1 | X/Twitter profile — SELAT-native | GET | `https://catalog.selat.ai/twitter/user/info?userName=${handle}` | x402 via Circle Gateway | $0.001 |
 | 2 | X/Twitter recent tweets — SELAT-native | GET | `https://catalog.selat.ai/twitter/user/last_tweets?userName=${handle}` | x402 via Circle Gateway | $0.001 |
 | 3 | YouTube presence — Scrape Creators | GET | `https://mpp.orthogonal.com/scrapecreators/v1/youtube/search?query=${name}` | MPP on Tempo | $0.021 |
-| 4 | Web reputation / news — Brave | POST | `https://brave.mpp.paywithlocus.com/brave/news-search` | MPP on Tempo | $0.0368 |
-| 5 | Web context / citations — Exa | POST | `https://api.exa.ai/search` | MPP on Tempo | $0.007 |
+| 4 | Web reputation / news — Brave | POST | `https://brave.mpp.paywithlocus.com/brave/news-search` | MPP on Tempo | $0.03675 |
+| 5 | Web context / citations — Exa | POST | `https://api.exa.ai/search` | MPP on Tempo | $0.00735 |
 | 6 | On-chain token footprint — Alchemy | GET | `https://x402.alchemy.com/data/v1/assets/tokens/by-address?address=${address}` | x402 via Circle Gateway | $0.001 |
 
-Prices probe-verified 2026-07-10. Full-run cap (`maxAmount`): **$0.50**; per-step cap **$0.05** (Brave $0.06, Alchemy $0.02). Live total ≈ $0.051.
+Prices probe-verified 2026-07-10. Full-run cap (`maxAmount`): **$0.50**; per-step cap **$0.05** (Brave $0.06, Alchemy $0.02). Live total ≈ $0.068.
 
 ## Rails & providers
 

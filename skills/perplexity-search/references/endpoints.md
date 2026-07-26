@@ -74,11 +74,14 @@ selat-pay POST "https://pplx.x402.paysponge.com/search" \
 >   consistent with the same overflow on the router's Node runtime fetching the
 >   upstream 402.
 >
-> Fix path (verified live 2026-07-25): raise `--max-http-header-size` on **both**
-> selat-pay and the Router — or, better, have the paysponge gateway move the giant
-> schema out of the HTTP header into the body. `/search` (5 KB header) and
-> `/v1/agent` (12 KB) stay under the limit and work. Until then, use `/search` +
-> agent synthesis, `/v1/agent`, or async `sonar-deep-research`.
+> **Fix in flight** (raise `--max-http-header-size` to 64 KB on both legs):
+> [selat-pay#28](https://github.com/SELAT-AI/selat-pay/pull/28) (client re-exec) and
+> [selat-router#51](https://github.com/SELAT-AI/selat-router/pull/51) (launch flag).
+> Once both merge **and the Router is redeployed**, `/v1/sonar` is payable. (Ideal
+> longer-term fix is upstream: paysponge moving the giant schema out of the HTTP
+> header into the body.) `/search` (5 KB header) and `/v1/agent` (12 KB) stay under
+> the limit and work today. Until the Router ships the fix, use `/search` + agent
+> synthesis, `/v1/agent`, or async `sonar-deep-research`.
 
 Raw body (`ApiChatCompletionsRequest`) — **no wrapper**:
 

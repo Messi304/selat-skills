@@ -58,25 +58,28 @@ selat-pay POST "https://pplx.x402.paysponge.com/search" \
 
 ### `POST /v1/sonar` — Create Chat Completion (synchronous answer)  ($0.10)
 
-> ✅ **Payable — requires selat-pay ≥ 0.9.2.** Live-verified 2026-07-26: probe
-> returns a quote at **$0.105** (upstream $0.10 + 5% routed markup) on Base.
+> ⚠ **Quote works, but a paid call currently fails with `431` — do not use yet.**
+> Live-tested 2026-07-26: the free probe returns a quote at **$0.105** (upstream
+> $0.10 + 5% routed markup), but the **paid** call returns `HTTP 431 Request Header
+> Fields Too Large` and is **charged-but-not-delivered** ($0.105 lost, no chargeback).
 >
-> Worth understanding, because it exercises the whole rail model: `/v1/sonar` serves
-> an x402 **v2 `upto`/`permit2`** challenge, and its 402 `payment-required` header is
-> **~17 KB** (it embeds the full 26-field body schema). That's over Node's old 16 KB
-> `--max-http-header-size` default, which used to make undici `fetch` throw
-> `UND_ERR_HEADERS_OVERFLOW` on **both** the client probe and the router — surfacing
-> as `502 {"error":"fetch failed"}`. Fixed by raising the limit to 64 KB on both legs
-> (selat-pay [#28](https://github.com/SELAT-AI/selat-pay/pull/28)/[#30](https://github.com/SELAT-AI/selat-pay/pull/30),
-> shipped in **selat-pay 0.9.2 / selat-cli 0.15.3**; router redeployed).
+> Root cause — the same 17 KB schema, now on the *request* leg. `/v1/sonar` serves an
+> x402 **v2 `upto`/`permit2`** 402 whose `payment-required` header is **~17 KB** (it
+> embeds the full 26-field body schema). The response-header fix (selat-pay 0.9.2 /
+> router redeploy, raising `--max-http-header-size` to 64 KB) lets both legs *read*
+> that challenge — which is why the quote now succeeds. But to pay the `upto`
+> upstream, the router's outbound `X-PAYMENT` request header echoes the requirements,
+> ballooning past **paysponge/Cloudflare's ~8–16 KB request-header limit** → `431`.
+> The router can't fix this by raising its own cap (the limit is upstream's).
 >
-> The scheme was never the issue: selat-pay only ever signs `GatewayWalletBatched`
-> (the wallet→router leg); the **Router adapts the outbound rail** — for `/v1/sonar`
-> it pays the `upto`/`permit2` upstream and hands the client an `exact` /
-> `GatewayWalletBatched` quote to sign. `/search` (5 KB header) and `/v1/agent`
-> (12 KB) were always under the limit. Older selat-pay (< 0.9.2) still can't read the
-> 17 KB header — fall back to `/search` + agent synthesis, `/v1/agent`, or async
-> `sonar-deep-research` there.
+> Fix needs one of: **paysponge** moving the schema out of the HTTP header into the
+> body (real fix), or the **router** trimming the echoed requirements from the
+> outbound `upto` payment payload. Until then, use `/search` + agent synthesis,
+> `/v1/agent`, or async `sonar-deep-research` — all confirmed working.
+>
+> (Note: selat-pay only ever signs `GatewayWalletBatched`; the Router adapts the
+> outbound rail — for `/v1/sonar` it pays the `upto`/`permit2` upstream. The scheme
+> was never the blocker; header size is, on both the response and now the request.)
 
 Raw body (`ApiChatCompletionsRequest`) — **no wrapper**:
 

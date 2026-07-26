@@ -22,7 +22,6 @@ list price; the live routed quote runs a few percent higher (router margin).
 | Endpoint | Method | ~Price | Poll? |
 |---|---|---|---|
 | `/search` | POST | $0.01 | — |
-| `/v1/sonar` | POST | $0.10 | — |
 | `/v1/agent` | POST | $0.01 | — |
 | `/v1/async/sonar` | POST | $0.01 | returns task id |
 | `/v1/async/sonar/{api_request}` | GET | **free** (`routed-free`) | poll target |
@@ -56,55 +55,6 @@ selat-pay POST "https://pplx.x402.paysponge.com/search" \
 > **string**. Numeric fields like `max_results` must be sent as real integers via a
 > hand-built `selat-pay` call, not through `${…}` substitution.
 
-### `POST /v1/sonar` — Create Chat Completion (synchronous answer)  ($0.10)
-
-> ⚠ **Not payable end-to-end today — but not for a scheme reason.** selat-pay only
-> ever signs `GatewayWalletBatched` (the inbound wallet→router leg); the SELAT
-> Router pays the upstream on whatever rail it serves (`exact`, x402 v2
-> `upto`/`permit2`, MPP). `/v1/sonar` does serve an x402 v2 `upto`/`permit2`
-> challenge — but that's fine for the router.
->
-> The actual blocker is an **oversized HTTP header**: `/v1/sonar`'s 402
-> `payment-required` header is **~17 KB** (it embeds the full 26-field body schema),
-> over Node's default 16 KB `--max-http-header-size`. So Node's `fetch` (undici)
-> throws `UND_ERR_HEADERS_OVERFLOW`:
-> - **Client:** selat-pay's probe fails → "no x402 or MPP challenge detected". With
->   `NODE_OPTIONS=--max-http-header-size=65536` it detects + routes fine.
-> - **Router:** even then the router returns `502 {"error":"fetch failed"}` —
->   consistent with the same overflow on the router's Node runtime fetching the
->   upstream 402.
->
-> **Fix in flight** (raise `--max-http-header-size` to 64 KB on both legs):
-> [selat-pay#28](https://github.com/SELAT-AI/selat-pay/pull/28) (client re-exec) and
-> [selat-router#51](https://github.com/SELAT-AI/selat-router/pull/51) (launch flag).
-> Once both merge **and the Router is redeployed**, `/v1/sonar` is payable. (Ideal
-> longer-term fix is upstream: paysponge moving the giant schema out of the HTTP
-> header into the body.) `/search` (5 KB header) and `/v1/agent` (12 KB) stay under
-> the limit and work today. Until the Router ships the fix, use `/search` + agent
-> synthesis, `/v1/agent`, or async `sonar-deep-research`.
-
-Raw body (`ApiChatCompletionsRequest`) — **no wrapper**:
-
-| Field | Req | Type | Values |
-|---|---|---|---|
-| `model` | ✅ | string | enum: `sonar`, `sonar-pro`, `sonar-deep-research`, `sonar-reasoning-pro` |
-| `messages` | ✅ | array | `[{ "role": "system\|user\|assistant\|tool", "content": "…" }]` |
-| `max_tokens` | | integer | completion cap |
-| `temperature` / `top_p` | | number | sampling |
-| `search_mode` | | string | `web` \| `academic` \| `sec` |
-| `search_recency_filter` | | string | `hour` \| `day` \| `week` \| `month` \| `year` |
-| `search_domain_filter` | | string[] | ≤ domains |
-| `search_after_date_filter` / `search_before_date_filter` | | string | `MM/DD/YYYY` |
-| `reasoning_effort` | | string | reasoning budget |
-| `return_related_questions` / `return_images` | | boolean | |
-| `response_format` | | object | text or JSON-schema structured output |
-
-```bash
-selat-pay POST "https://pplx.x402.paysponge.com/v1/sonar" \
-  --body '{"model":"sonar","messages":[{"role":"user","content":"What is the latest on x402 adoption? Cite sources."}]}' \
-  --chain base --max-amount 0.15
-```
-
 ### `POST /v1/agent` — Create Agent Response  ($0.01)  ✓ verified 200 (2026-07-25)
 
 Payable via selat-pay (`exact` / routed-x402, ~$0.0105). Body:
@@ -136,7 +86,7 @@ Body — **wraps the chat request**:
 
 | Field | Req | Type | Notes |
 |---|---|---|---|
-| `request` | ✅ | ApiChatCompletionsRequest | same shape as `/v1/sonar` body — but `model` **must** be `sonar-deep-research` |
+| `request` | ✅ | ApiChatCompletionsRequest | a chat-completion request `{model, messages, …}` — `model` **must** be `sonar-deep-research` |
 | `idempotency_key` | | string | reuse to prevent a duplicate (costly) submission on retry |
 
 Returns `{ "id": "<uuid>", "status": "CREATED", "response": null, … }`.

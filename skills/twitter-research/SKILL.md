@@ -78,8 +78,10 @@ tweet-reception breakdown, topic chatter, or trend list — whichever was asked)
 - **Params are per-endpoint.** `handle` drives the `user/*` reads, `tweetId` the
   `tweet/*` reads, `query` the search, `woeid` the trends. Passing an unused
   param is harmless; a step only uses the params in its URL.
-- **`tweets` takes `tweet_ids` (plural), the reply/retweeter reads take
-  `tweet_id`.** Same value, different query key — already wired in the manifest.
+- **Tweet-id param names differ per endpoint (live API, not the OpenAPI):**
+  `tweets` takes `tweet_ids` (snake_case, comma-separated batch); `tweet/replies`
+  and `tweet/retweeters` take `tweetId` (camelCase). The OpenAPI's `tweet_id` for
+  the latter two 400s (`"tweetId is required"`) — the manifest uses `tweetId`.
 - **`woeid` is a Yahoo Where-On-Earth ID, not a country code** (`1` = worldwide).
 - **Handles have no leading `@`.** Strip it before passing `handle` (the API param
   is `userName`; the manifest maps `${handle}` → `userName=`).

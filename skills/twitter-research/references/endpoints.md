@@ -20,8 +20,8 @@ response schemas), so response fields are described from live reads, not the spe
 | 5 | search | `GET catalog.selat.ai/twitter/tweet/advanced_search?query=${query}` | `query`, `cursor` | $0.001 |
 | 6 | trends | `GET catalog.selat.ai/twitter/trends?woeid=${woeid}` | `woeid` | $0.001 |
 | 7 | tweet | `GET catalog.selat.ai/twitter/tweets?tweet_ids=${tweetId}` | `tweet_ids` | $0.001 |
-| 8 | tweet | `GET catalog.selat.ai/twitter/tweet/replies?tweet_id=${tweetId}` | `tweet_id`, `cursor` | $0.001 |
-| 9 | tweet | `GET catalog.selat.ai/twitter/tweet/retweeters?tweet_id=${tweetId}` | `tweet_id`, `cursor` | $0.001 |
+| 8 | tweet | `GET catalog.selat.ai/twitter/tweet/replies?tweetId=${tweetId}` | `tweetId`, `cursor` | $0.001 |
+| 9 | tweet | `GET catalog.selat.ai/twitter/tweet/retweeters?tweetId=${tweetId}` | `tweetId`, `cursor` | $0.001 |
 
 Per-step cap **$0.10**, full-run cap **$0.10**. A selected 1-3 endpoint run costs
 $0.001-$0.003; the full 9-step smoke test (`verify --pay`) is ~$0.009.
@@ -44,17 +44,20 @@ Every parameter is `in: query`, type `string`. `req` = required by the spec.
 | | | `cursor` | | — | Pagination token. |
 | 6 | `/twitter/trends` | `woeid` | ✅ | `${woeid}` | Yahoo WOEID as a **string** (`1` = worldwide, `23424977` = US, `2459115` = NYC). |
 | 7 | `/twitter/tweets` | `tweet_ids` | ✅ | `${tweetId}` | **Comma-separated** numeric IDs — this endpoint batches many (`20,21,22`). The manifest passes one; hand-build the call for a batch. |
-| 8 | `/twitter/tweet/replies` | `tweet_id` | ✅ | `${tweetId}` | **Singular** — one numeric ID. |
+| 8 | `/twitter/tweet/replies` | `tweetId` ⚠ | ✅ | `${tweetId}` | **Singular** — one numeric ID. ⚠ Live API wants **`tweetId`** (camelCase); the OpenAPI's `tweet_id` returns `400 "tweetId is required"`. |
 | | | `cursor` | | — | Pagination token. |
-| 9 | `/twitter/tweet/retweeters` | `tweet_id` | ✅ | `${tweetId}` | **Singular** — one numeric ID. |
+| 9 | `/twitter/tweet/retweeters` | `tweetId` ⚠ | ✅ | `${tweetId}` | **Singular** — one numeric ID. ⚠ Same as #8: live API wants **`tweetId`**, not the OpenAPI's `tweet_id`. |
 
 ### Schema gotchas (what to get right so a paid call doesn't 4xx)
 
 - **The API param is `userName`, not `handle`.** The manifest maps `${handle}` →
   `userName=` in the URL; pass the handle **without** the `@`.
-- **`tweet_ids` (plural, batch) vs `tweet_id` (singular).** `/twitter/tweets`
-  takes a **comma-separated** list; `/tweet/replies` and `/tweet/retweeters` take
-  exactly one. Don't send a comma-separated value to the singular endpoints.
+- **Three different tweet-id param names — the OpenAPI is unreliable here, live API is authoritative** (verified by paid `verify --pay`, 2026-07-25):
+  - `/twitter/tweets` → **`tweet_ids`** (snake_case, plural, comma-separated batch).
+  - `/tweet/replies` and `/tweet/retweeters` → **`tweetId`** (camelCase, singular).
+    The OpenAPI documents these as `tweet_id`, but that returns
+    `400 {"detail":"tweetId is required"}`. The manifest uses `tweetId`.
+  - Don't send a comma-separated value to the singular endpoints.
 - **`woeid` is typed `string`** in the spec even though it looks numeric — pass it
   as-is; it works either way through query-string substitution.
 - **`cursor` is not a manifest param.** The 4 paginated reads

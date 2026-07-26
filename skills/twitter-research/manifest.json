@@ -79,14 +79,14 @@
       "label": "tweet replies — SELAT Twitter tweet/replies (x402 via Circle Gateway)",
       "rail": "x402 via Circle Gateway",
       "method": "GET",
-      "url": "https://catalog.selat.ai/twitter/tweet/replies?tweet_id=${tweetId}",
+      "url": "https://catalog.selat.ai/twitter/tweet/replies?tweetId=${tweetId}",
       "maxAmount": "0.10"
     },
     {
       "label": "tweet retweeters — SELAT Twitter tweet/retweeters (x402 via Circle Gateway)",
       "rail": "x402 via Circle Gateway",
       "method": "GET",
-      "url": "https://catalog.selat.ai/twitter/tweet/retweeters?tweet_id=${tweetId}",
+      "url": "https://catalog.selat.ai/twitter/tweet/retweeters?tweetId=${tweetId}",
       "maxAmount": "0.10"
     }
   ]

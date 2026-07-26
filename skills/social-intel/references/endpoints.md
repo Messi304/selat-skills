@@ -8,8 +8,8 @@ Grounded web-context intelligence over two independent web-search engines, both
 
 | # | Step | Method | URL | Rail | ~Price |
 |---|---|---|---|---|---|
-| 1 | Web context — Exa | POST | `https://api.exa.ai/search` (body `{"query":"${topic}",...}`) | MPP on Tempo | $0.007 |
-| 2 | Web corroboration — Tavily | POST | `https://x402.tavily.com/search` (body `{"query":"${topic}","search_depth":"advanced"}`) | x402 on Base | $0.011 |
+| 1 | Web context — Exa | POST | `https://api.exa.ai/search` (body `{"query":"${topic}",...}`) | MPP on Tempo | $0.00735 |
+| 2 | Web corroboration — Tavily | POST | `https://x402.tavily.com/search` (body `{"query":"${topic}","search_depth":"advanced"}`) | x402 on Base | $0.0105 |
 
 Full-run cap (`maxAmount`): **$0.10**; per-step cap **$0.05**. Live total ≈ $0.018
 (prices probe-verified 2026-07-24).

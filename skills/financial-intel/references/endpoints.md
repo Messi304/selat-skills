@@ -15,7 +15,7 @@ no API keys.
 | 3 | Equities / macro quote — Alpha Vantage | POST | `https://alphavantage.mpp.paywithlocus.com/alphavantage/global-quote` | MPP on Tempo | $0.0084 |
 | 4 | On-chain smart-money holdings — Nansen | POST | `https://api.nansen.ai/api/v1/smart-money/holdings` | MPP on Tempo | $0.0525 |
 | 5 | Fundamentals / funding rounds — Messari | GET | `https://api.messari.io/funding/v1/rounds` | x402 on Base | $0.1575 |
-| 6 | Market news / context — Exa | POST | `https://api.exa.ai/search` | MPP on Tempo | $0.007 |
+| 6 | Market news / context — Exa | POST | `https://api.exa.ai/search` | MPP on Tempo | $0.00735 |
 
 Full-run cap (`maxAmount`): **$1.00**; per-step caps range **$0.01–$0.25**. Live total ≈ $0.29.
 

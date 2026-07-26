@@ -58,12 +58,27 @@ selat-pay POST "https://pplx.x402.paysponge.com/search" \
 
 ### `POST /v1/sonar` — Create Chat Completion (synchronous answer)  ($0.10)
 
-> ⚠ **Not payable via selat-pay today.** Unlike every other endpoint here (which
-> serve `exact` / `GatewayWalletBatched`), `/v1/sonar` serves an **x402 v2 `upto`
-> scheme with `permit2`** asset transfer (facilitator `0xB2Bd…371B`). selat-pay
-> reports "no x402 or MPP challenge detected" and cannot settle it. Verified live
-> 2026-07-25. Use `/search` + agent synthesis, or async `sonar-deep-research`,
-> until selat-pay supports the `upto`/permit2 scheme.
+> ⚠ **Not payable end-to-end today — but not for a scheme reason.** selat-pay only
+> ever signs `GatewayWalletBatched` (the inbound wallet→router leg); the SELAT
+> Router pays the upstream on whatever rail it serves (`exact`, x402 v2
+> `upto`/`permit2`, MPP). `/v1/sonar` does serve an x402 v2 `upto`/`permit2`
+> challenge — but that's fine for the router.
+>
+> The actual blocker is an **oversized HTTP header**: `/v1/sonar`'s 402
+> `payment-required` header is **~17 KB** (it embeds the full 26-field body schema),
+> over Node's default 16 KB `--max-http-header-size`. So Node's `fetch` (undici)
+> throws `UND_ERR_HEADERS_OVERFLOW`:
+> - **Client:** selat-pay's probe fails → "no x402 or MPP challenge detected". With
+>   `NODE_OPTIONS=--max-http-header-size=65536` it detects + routes fine.
+> - **Router:** even then the router returns `502 {"error":"fetch failed"}` —
+>   consistent with the same overflow on the router's Node runtime fetching the
+>   upstream 402.
+>
+> Fix path (verified live 2026-07-25): raise `--max-http-header-size` on **both**
+> selat-pay and the Router — or, better, have the paysponge gateway move the giant
+> schema out of the HTTP header into the body. `/search` (5 KB header) and
+> `/v1/agent` (12 KB) stay under the limit and work. Until then, use `/search` +
+> agent synthesis, `/v1/agent`, or async `sonar-deep-research`.
 
 Raw body (`ApiChatCompletionsRequest`) — **no wrapper**:
 

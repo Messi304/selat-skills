@@ -60,13 +60,11 @@ Exact bodies are in [`references/endpoints.md`](references/endpoints.md).
   search results in one call. **Requires `input` plus one of `model`/`models`/`preset`**
   (the OpenAPI wrongly marks only `input` required). This is the cheap synchronous
   escalation — prefer it over `/v1/sonar`.
-- **Synchronous chat (~$0.10) — ⚠ blocked pending a fix:** `POST /v1/sonar`'s 402
-  `payment-required` header is ~17 KB (over Node's 16 KB default), so undici throws
-  `UND_ERR_HEADERS_OVERFLOW` — the client probe *and* the router both fail on it
-  (router returns `502 "fetch failed"`). Not a scheme issue (the router pays
-  `upto`/`permit2` fine); a header-size limit. Fix in flight — selat-pay#28 +
-  selat-router#51 raise the limit; usable once merged and the Router redeploys.
-  Until then use `/v1/agent` or async deep-research.
+- **Synchronous chat (~$0.10, ✓ payable, needs selat-pay ≥ 0.9.2):** `POST /v1/sonar`
+  returns a full synthesized answer + citations in one call. Its 402 uses the x402 v2
+  `upto`/`permit2` scheme with a ~17 KB `payment-required` header — readable only on
+  selat-pay ≥ 0.9.2 (older builds throw `UND_ERR_HEADERS_OVERFLOW`). Live quote ~$0.105
+  ($0.10 + 5% routed markup). On older selat-pay, use `/v1/agent` or async deep-research.
 - **Deep research (~$0.01 + minutes):** `POST /v1/async/sonar` with
   `{"request":{"model":"sonar-deep-research","messages":[…]}}` returns a task `id`;
   then poll `GET /v1/async/sonar/{id}` (**free**) every ~15s until `status:"COMPLETED"`

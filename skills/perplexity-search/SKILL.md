@@ -16,7 +16,7 @@ Grounded web search and research via **Perplexity's x402 endpoints**, fronted by
 paysponge gateway and **routed through the SELAT Router**. The default paid step is the
 cheap `POST /search` ($0.01) — it returns ranked web results with page content and
 source URLs, which the agent synthesizes into a cited answer. Two escalations (a
-synchronous Sonar answer, and an async deep-research report) are documented below for
+synchronous agent answer, and an async deep-research report) are documented below for
 when a search-and-synthesize pass isn't enough.
 
 ## When To Use
@@ -50,22 +50,16 @@ Single paid step, native x402, **routed** through the SELAT Router (`rail: route
 
 ### Escalations (agent-run; not part of the default step)
 
-These use the same wallet/rail but are **not** wired as manifest steps — `/v1/sonar` is
-pricier and the async flow needs a poll loop the linear runner can't express. Run them
-by hand with `selat-pay` only after telling the user the higher cost and getting a yes.
-Exact bodies are in [`references/endpoints.md`](references/endpoints.md).
+These use the same wallet/rail but are **not** wired as manifest steps — the async
+flow needs a poll loop the linear runner can't express. Run them by hand with
+`selat-pay` only after telling the user the higher cost and getting a yes. Exact
+bodies are in [`references/endpoints.md`](references/endpoints.md).
 
 - **Agent answer (~$0.01, ✓ verified):** `POST /v1/agent` with
   `{"input":"…","preset":"fast-search"}` returns a synthesized answer with live
   search results in one call. **Requires `input` plus one of `model`/`models`/`preset`**
   (the OpenAPI wrongly marks only `input` required). This is the cheap synchronous
-  escalation — prefer it over `/v1/sonar`.
-- **Synchronous chat (~$0.10) — ⚠ don't use yet, paid call `431`s:** `POST /v1/sonar`'s
-  quote now works (selat-pay ≥ 0.9.2 reads its ~17 KB `upto`/`permit2` 402), but the
-  **paid** call returns `HTTP 431 Request Header Fields Too Large` and is charged-but-not-
-  delivered — the router's outbound payment header echoes the 17 KB schema past
-  paysponge/Cloudflare's request-header limit. Use `/v1/agent` or async deep-research
-  instead until the upstream shrinks the header (or the router trims the echoed payload).
+  escalation for a one-call answer.
 - **Deep research (~$0.01 + minutes):** `POST /v1/async/sonar` with
   `{"request":{"model":"sonar-deep-research","messages":[…]}}` returns a task `id`;
   then poll `GET /v1/async/sonar/{id}` (**free**) every ~15s until `status:"COMPLETED"`
@@ -91,11 +85,14 @@ agent reads and synthesizes into a cited brief.
   numeric field like `max_results` wired through `${…}` would send `"8"` and 4xx. Keep
   string-typed fields in the manifest body; adjust integer options only in a hand-built
   `selat-pay` call.
-- **Sync vs async body shape differs.** `POST /v1/sonar` takes a **raw** `{model,messages}`
-  body. `POST /v1/async/sonar` wraps it: `{"request":{model,messages}}`. Mixing them 4xxs.
+- **Async body wraps the request.** `POST /v1/async/sonar` needs
+  `{"request":{model,messages}}` — a raw completion object (no `request` wrapper) 4xxs.
 - **Async is `sonar-deep-research`-only.** `POST /v1/async/sonar` rejects `model:"sonar"`
-  ("Async processing is only available for sonar-deep-research"). For plain `sonar`, use
-  the synchronous `/v1/sonar` instead.
+  ("Async processing is only available for sonar-deep-research"). For a non-deep-research
+  answer, use `/v1/agent` or `/search` instead.
+- **`/v1/sonar` (synchronous chat) is intentionally omitted** — its paid call fails with
+  `HTTP 431` (charged-but-not-delivered) until the upstream/router header issue is fixed
+  (see repo issue #51). Don't add it back as a step.
 - **`recency` must be one of** `hour|day|week|month|year`; any other value 4xxs (and costs).
 - **The poll GET is free** (`mode=routed-free`, $0) — poll as often as needed at no cost.
 - `idempotency_key` is accepted on `/v1/async/sonar` — reuse the same key to avoid

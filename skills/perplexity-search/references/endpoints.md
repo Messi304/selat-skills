@@ -22,7 +22,6 @@ list price; the live routed quote runs a few percent higher (router margin).
 | Endpoint | Method | ~Price | Poll? |
 |---|---|---|---|
 | `/search` | POST | $0.01 | — |
-| `/v1/sonar` | POST | $0.10 | — |
 | `/v1/agent` | POST | $0.01 | — |
 | `/v1/async/sonar` | POST | $0.01 | returns task id |
 | `/v1/async/sonar/{api_request}` | GET | **free** (`routed-free`) | poll target |
@@ -56,53 +55,6 @@ selat-pay POST "https://pplx.x402.paysponge.com/search" \
 > **string**. Numeric fields like `max_results` must be sent as real integers via a
 > hand-built `selat-pay` call, not through `${…}` substitution.
 
-### `POST /v1/sonar` — Create Chat Completion (synchronous answer)  ($0.10)
-
-> ⚠ **Quote works, but a paid call currently fails with `431` — do not use yet.**
-> Live-tested 2026-07-26: the free probe returns a quote at **$0.105** (upstream
-> $0.10 + 5% routed markup), but the **paid** call returns `HTTP 431 Request Header
-> Fields Too Large` and is **charged-but-not-delivered** ($0.105 lost, no chargeback).
->
-> Root cause — the same 17 KB schema, now on the *request* leg. `/v1/sonar` serves an
-> x402 **v2 `upto`/`permit2`** 402 whose `payment-required` header is **~17 KB** (it
-> embeds the full 26-field body schema). The response-header fix (selat-pay 0.9.2 /
-> router redeploy, raising `--max-http-header-size` to 64 KB) lets both legs *read*
-> that challenge — which is why the quote now succeeds. But to pay the `upto`
-> upstream, the router's outbound `X-PAYMENT` request header echoes the requirements,
-> ballooning past **paysponge/Cloudflare's ~8–16 KB request-header limit** → `431`.
-> The router can't fix this by raising its own cap (the limit is upstream's).
->
-> Fix needs one of: **paysponge** moving the schema out of the HTTP header into the
-> body (real fix), or the **router** trimming the echoed requirements from the
-> outbound `upto` payment payload. Until then, use `/search` + agent synthesis,
-> `/v1/agent`, or async `sonar-deep-research` — all confirmed working.
->
-> (Note: selat-pay only ever signs `GatewayWalletBatched`; the Router adapts the
-> outbound rail — for `/v1/sonar` it pays the `upto`/`permit2` upstream. The scheme
-> was never the blocker; header size is, on both the response and now the request.)
-
-Raw body (`ApiChatCompletionsRequest`) — **no wrapper**:
-
-| Field | Req | Type | Values |
-|---|---|---|---|
-| `model` | ✅ | string | enum: `sonar`, `sonar-pro`, `sonar-deep-research`, `sonar-reasoning-pro` |
-| `messages` | ✅ | array | `[{ "role": "system\|user\|assistant\|tool", "content": "…" }]` |
-| `max_tokens` | | integer | completion cap |
-| `temperature` / `top_p` | | number | sampling |
-| `search_mode` | | string | `web` \| `academic` \| `sec` |
-| `search_recency_filter` | | string | `hour` \| `day` \| `week` \| `month` \| `year` |
-| `search_domain_filter` | | string[] | ≤ domains |
-| `search_after_date_filter` / `search_before_date_filter` | | string | `MM/DD/YYYY` |
-| `reasoning_effort` | | string | reasoning budget |
-| `return_related_questions` / `return_images` | | boolean | |
-| `response_format` | | object | text or JSON-schema structured output |
-
-```bash
-selat-pay POST "https://pplx.x402.paysponge.com/v1/sonar" \
-  --body '{"model":"sonar","messages":[{"role":"user","content":"What is the latest on x402 adoption? Cite sources."}]}' \
-  --chain base --max-amount 0.15
-```
-
 ### `POST /v1/agent` — Create Agent Response  ($0.01)  ✓ verified 200 (2026-07-25)
 
 Payable via selat-pay (`exact` / routed-x402, ~$0.0105). Body:
@@ -134,7 +86,7 @@ Body — **wraps the chat request**:
 
 | Field | Req | Type | Notes |
 |---|---|---|---|
-| `request` | ✅ | ApiChatCompletionsRequest | same shape as `/v1/sonar` body — but `model` **must** be `sonar-deep-research` |
+| `request` | ✅ | ApiChatCompletionsRequest | a chat-completion request `{model, messages, …}` — `model` **must** be `sonar-deep-research` |
 | `idempotency_key` | | string | reuse to prevent a duplicate (costly) submission on retry |
 
 Returns `{ "id": "<uuid>", "status": "CREATED", "response": null, … }`.

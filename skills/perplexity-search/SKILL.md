@@ -55,8 +55,15 @@ pricier and the async flow needs a poll loop the linear runner can't express. Ru
 by hand with `selat-pay` only after telling the user the higher cost and getting a yes.
 Exact bodies are in [`references/endpoints.md`](references/endpoints.md).
 
-- **Synchronous answer (~$0.10):** `POST /v1/sonar` with `{"model":"sonar","messages":[…]}`
-  returns a synthesized answer + citations in one call (no wrapper, no poll).
+- **Agent answer (~$0.01, ✓ verified):** `POST /v1/agent` with
+  `{"input":"…","preset":"fast-search"}` returns a synthesized answer with live
+  search results in one call. **Requires `input` plus one of `model`/`models`/`preset`**
+  (the OpenAPI wrongly marks only `input` required). This is the cheap synchronous
+  escalation — prefer it over `/v1/sonar`.
+- **Synchronous chat (~$0.10) — ⚠ not payable via selat-pay today:** `POST /v1/sonar`
+  serves an x402 v2 `upto`/`permit2` challenge that selat-pay can't settle ("no
+  challenge detected"). Skip until the client supports that scheme; use `/v1/agent`
+  or async deep-research instead.
 - **Deep research (~$0.01 + minutes):** `POST /v1/async/sonar` with
   `{"request":{"model":"sonar-deep-research","messages":[…]}}` returns a task `id`;
   then poll `GET /v1/async/sonar/{id}` (**free**) every ~15s until `status:"COMPLETED"`

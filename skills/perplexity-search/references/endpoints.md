@@ -58,6 +58,13 @@ selat-pay POST "https://pplx.x402.paysponge.com/search" \
 
 ### `POST /v1/sonar` — Create Chat Completion (synchronous answer)  ($0.10)
 
+> ⚠ **Not payable via selat-pay today.** Unlike every other endpoint here (which
+> serve `exact` / `GatewayWalletBatched`), `/v1/sonar` serves an **x402 v2 `upto`
+> scheme with `permit2`** asset transfer (facilitator `0xB2Bd…371B`). selat-pay
+> reports "no x402 or MPP challenge detected" and cannot settle it. Verified live
+> 2026-07-25. Use `/search` + agent synthesis, or async `sonar-deep-research`,
+> until selat-pay supports the `upto`/permit2 scheme.
+
 Raw body (`ApiChatCompletionsRequest`) — **no wrapper**:
 
 | Field | Req | Type | Values |
@@ -80,21 +87,24 @@ selat-pay POST "https://pplx.x402.paysponge.com/v1/sonar" \
   --chain base --max-amount 0.15
 ```
 
-### `POST /v1/agent` — Create Agent Response  ($0.01)
+### `POST /v1/agent` — Create Agent Response  ($0.01)  ✓ verified 200 (2026-07-25)
 
-Body:
+Payable via selat-pay (`exact` / routed-x402, ~$0.0105). Body:
 
 | Field | Req | Type | Notes |
 |---|---|---|---|
 | `input` | ✅ | string \| InputItem[] | the task/prompt |
-| `model` | | string | `provider/model` form, e.g. `xai/grok-…` |
-| `models` | | array | fallback chain |
+| **one of** `model` / `models` / `preset` | ✅ | — | **Required — the OpenAPI marks only `input`, but the live API rejects a body without one of these:** `400 "validation failed: model, models, or preset is required"`. |
+| `model` | ➊ | string | `provider/model` form, e.g. `openai/gpt-5.4-mini`. |
+| `models` | ➊ | array | fallback chain. |
+| `preset` | ➊ | string | e.g. `fast-search` (simplest — used in the verified call below). |
 | `tools` | | array | tools available to the model |
-| `preset` | | string | e.g. `fast-search` |
 | `max_steps` | | integer | research-loop cap |
 | `instructions` | | string | system instructions |
 | `response_format` | | object | structured output |
 | `stream` | | boolean | SSE if true |
+
+_➊ = supply exactly one of `model`/`models`/`preset`._
 
 ```bash
 selat-pay POST "https://pplx.x402.paysponge.com/v1/agent" \

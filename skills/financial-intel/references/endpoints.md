@@ -32,7 +32,7 @@ This skill mixes a Circle Gateway nanopayment with x402 + MPP protocols (`rail: 
   through the SELAT Router (`MPP on Tempo`). Sourced from the MPP catalog.
 - **x402 on Base** — Messari (`api.messari.io`) and Exa (`api.exa.ai`)
   serve native x402 challenges; the router settles them on Base
-  (`x402 on Base`). Sourced from the Agentic Market / x402 catalogs.
+  (`x402 on Base`). Sourced from the x402 Bazaar / x402 catalogs.
 
 ## Live probes (free; no wallet)
 

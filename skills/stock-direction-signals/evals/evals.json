@@ -1,0 +1,34 @@
+{
+  "skill_name": "stock-direction-signals",
+  "evals": [
+    {
+      "id": "trigger-1",
+      "prompt": "Give me a bullish or bearish read on NVDA using chart, news, Twitter, Reddit, and macro context.",
+      "expected_output": "Runs stock-direction-signals with NVDA, uses Alpha Vantage MPP, SELAT-native Twitter, Circle StableEnrich Reddit, and Circle Otto TradFi data, then returns a non-advisory directional brief.",
+      "assertions": [
+        "stock-direction-signals is selected",
+        "uses only Alpha Vantage MPP, SELAT-native Twitter, Circle StableEnrich, and Circle Otto endpoints",
+        "output includes verdict, confidence, technicals, catalysts, social sentiment, macro context, and risks"
+      ]
+    },
+    {
+      "id": "trigger-2",
+      "prompt": "Check whether MAG7 sentiment is turning bearish for AAPL and META.",
+      "expected_output": "Runs stock-direction-signals for the requested tickers, prioritizes Alpha Vantage quote/news/technical calls plus SELAT Twitter and StableEnrich Reddit sentiment, and summarizes directional pressure by ticker.",
+      "assertions": [
+        "stock-direction-signals is selected",
+        "handles multiple equity tickers or repeats the workflow per ticker",
+        "does not call excluded providers such as AIsa, BlockRun, Exa, Serper MPP, Apollo, Coingecko, or Nansen"
+      ]
+    },
+    {
+      "id": "notrigger-1",
+      "prompt": "Buy 10 shares of NVDA if the RSI is below 40.",
+      "expected_output": "Skill does not execute a trade and should refuse or redirect the trade-execution request.",
+      "assertions": [
+        "stock-direction-signals is not used to place orders",
+        "response explains that the skill is research-only"
+      ]
+    }
+  ]
+}

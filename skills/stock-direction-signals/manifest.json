@@ -1,0 +1,115 @@
+{
+  "schema": "selat-skill/v1",
+  "name": "stock-direction-signals",
+  "description": "Provider-filtered stock direction research \u2014 Alpha Vantage MPP for quote/chart/technicals/news/earnings, SELAT-native Twitter for social chatter, Circle StableEnrich for Reddit, Circle Otto for TradFi macro \u2014 fused into a non-advisory bullish/bearish/mixed brief. Paid per call via selat-pay across mixed rails (MPP on Tempo + x402 on Base) via the SELAT Router.",
+  "maxAmount": "0.25",
+  "params": {
+    "ticker": {
+      "required": true,
+      "default": "NVDA",
+      "description": "US equity ticker or index proxy (used as ${ticker}). Always pass the user's ticker explicitly; never let the default silently research another company."
+    },
+    "twitter_query": {
+      "required": false,
+      "default": "$NVDA OR NVIDIA",
+      "description": "SELAT-native Twitter advanced-search query (used as ${twitter_query}). Widen with company and product terms, e.g. \"$NVDA OR NVIDIA OR Blackwell\". Retarget alongside ticker."
+    },
+    "reddit_query": {
+      "required": false,
+      "default": "NVDA stock",
+      "description": "Reddit search query for Circle StableEnrich (used as ${reddit_query}). Add company and product terms for richer threads. Retarget alongside ticker."
+    }
+  },
+  "steps": [
+    {
+      "label": "twitter chatter \u2014 SELAT-native advanced search (x402 on Base)",
+      "rail": "x402 on Base",
+      "method": "GET",
+      "url": "https://catalog.selat.ai/twitter/tweet/advanced_search?query=${twitter_query}&queryType=Latest",
+      "maxAmount": "0.01"
+    },
+    {
+      "label": "macro regime \u2014 Circle Otto tradfi-data (x402 on Base)",
+      "rail": "x402 on Base",
+      "method": "GET",
+      "url": "https://x402.ottoai.services/tradfi-data?symbol=${ticker}",
+      "maxAmount": "0.02"
+    },
+    {
+      "label": "quote \u2014 Alpha Vantage global-quote (MPP on Tempo)",
+      "rail": "MPP on Tempo",
+      "method": "POST",
+      "url": "https://alphavantage.mpp.paywithlocus.com/alphavantage/global-quote",
+      "body": {
+        "symbol": "${ticker}"
+      },
+      "maxAmount": "0.02"
+    },
+    {
+      "label": "daily chart \u2014 Alpha Vantage time-series-daily (MPP on Tempo)",
+      "rail": "MPP on Tempo",
+      "method": "POST",
+      "url": "https://alphavantage.mpp.paywithlocus.com/alphavantage/time-series-daily",
+      "body": {
+        "symbol": "${ticker}"
+      },
+      "maxAmount": "0.02"
+    },
+    {
+      "label": "momentum \u2014 Alpha Vantage RSI (MPP on Tempo)",
+      "rail": "MPP on Tempo",
+      "method": "POST",
+      "url": "https://alphavantage.mpp.paywithlocus.com/alphavantage/rsi",
+      "body": {
+        "symbol": "${ticker}",
+        "interval": "daily",
+        "time_period": 14,
+        "series_type": "close"
+      },
+      "maxAmount": "0.02"
+    },
+    {
+      "label": "trend \u2014 Alpha Vantage MACD (MPP on Tempo)",
+      "rail": "MPP on Tempo",
+      "method": "POST",
+      "url": "https://alphavantage.mpp.paywithlocus.com/alphavantage/macd",
+      "body": {
+        "symbol": "${ticker}",
+        "interval": "daily",
+        "series_type": "close"
+      },
+      "maxAmount": "0.02"
+    },
+    {
+      "label": "catalysts \u2014 Alpha Vantage news-sentiment (MPP on Tempo)",
+      "rail": "MPP on Tempo",
+      "method": "POST",
+      "url": "https://alphavantage.mpp.paywithlocus.com/alphavantage/news-sentiment",
+      "body": {
+        "tickers": "${ticker}",
+        "limit": 20
+      },
+      "maxAmount": "0.02"
+    },
+    {
+      "label": "earnings \u2014 Alpha Vantage earnings (MPP on Tempo)",
+      "rail": "MPP on Tempo",
+      "method": "POST",
+      "url": "https://alphavantage.mpp.paywithlocus.com/alphavantage/earnings",
+      "body": {
+        "symbol": "${ticker}"
+      },
+      "maxAmount": "0.02"
+    },
+    {
+      "label": "reddit chatter \u2014 Circle StableEnrich reddit search (MPP on Tempo)",
+      "rail": "MPP on Tempo",
+      "method": "POST",
+      "url": "https://stableenrich.dev/api/reddit/search",
+      "body": {
+        "query": "${reddit_query}"
+      },
+      "maxAmount": "0.04"
+    }
+  ]
+}

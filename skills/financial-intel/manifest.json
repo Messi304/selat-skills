@@ -65,7 +65,7 @@
       "method": "POST",
       "url": "https://api.nansen.ai/api/v1/smart-money/holdings",
       "body": {
-        "chain": "${chain}"
+        "chains": ["${chain}"]
       },
       "maxAmount": "0.10"
     },

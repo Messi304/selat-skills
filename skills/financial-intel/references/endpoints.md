@@ -3,8 +3,8 @@
 Multi-signal financial intelligence across **two settlement modes** from the
 SELAT federated catalogue: a Circle Gateway-batched nanopayment
 (`x402 via Circle Gateway`, Alchemy) and **MPP on Tempo** (CoinGecko, Alpha
-Vantage, Nansen, Exa). Paid per call via selat-pay (USDC via Circle Gateway),
-no API keys.
+Vantage, Nansen, Exa). Paid per call via selat-pay
+(USDC via Circle Gateway), no API keys.
 
 ## Endpoints used
 
@@ -29,7 +29,12 @@ This skill mixes a Circle Gateway nanopayment with MPP (`rail: mixed`).
 - **MPP on Tempo** — CoinGecko (`coingecko.mpp.paywithlocus.com`), Alpha Vantage
   (`alphavantage.mpp.paywithlocus.com`), Nansen (`api.nansen.ai`), and Exa
   (`api.exa.ai`) settle MPP through the SELAT Router (`MPP on Tempo`). Sourced
-  from the MPP catalog.
+  from the MPP catalog. Note: Nansen is dual-protocol with a **gated** MPP
+  challenge — a bare probe 402s with x402 only, and the MPP
+  `WWW-Authenticate: Payment` (method `tempo`) surfaces only under an
+  `Authorization: Payment` probe (selat-pay's probe 2 sends it). The registry
+  listing is accurate; a routed-MPP charge settles live (verified 2026-08-13,
+  $0.0525, HTTP 200).
 
 ## Live probes (free; no wallet)
 
@@ -43,11 +48,13 @@ selat-pay POST "https://coingecko.mpp.paywithlocus.com/coingecko/coins-markets" 
   --body '{"vs_currency":"usd","ids":"ethereum"}' --chain base --probe-only
 selat-pay POST "https://alphavantage.mpp.paywithlocus.com/alphavantage/global-quote" \
   --body '{"symbol":"AAPL"}' --chain base --probe-only
-selat-pay POST "https://api.nansen.ai/api/v1/smart-money/holdings" \
-  --body '{"chain":"ethereum"}' --chain base --probe-only
 selat-pay POST "https://api.exa.ai/search" \
   --body '{"query":"ethereum ETF flows","numResults":5}' --chain base --probe-only
+
+selat-pay POST "https://api.nansen.ai/api/v1/smart-money/holdings" \
+  --body '{"chains":["ethereum"]}' --chain base --probe-only  # note `chains` is an array
 ```
 
 A served endpoint prints `detected ... price=$X on eip155:8453`. The Alchemy step
-shows `x402 via Circle Gateway`; CoinGecko/Alpha Vantage/Nansen/Exa show `MPP on Tempo`.
+shows `x402 via Circle Gateway`; CoinGecko/Alpha Vantage/Nansen/Exa show
+`MPP on Tempo` (Nansen via the dual-protocol probe 2 — `mode=routed-mpp`).

@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires the selat CLI, selat-pay >= 0.7.0, and a funded Circle Agent Wallet. The SELAT Router steps (CoinGecko, Alpha Vantage, Nansen, Exa) need a reachable SELAT Router (SELAT_ROUTER_URL); the Circle-Gateway Alchemy step does not. `selat skill verify` (no --pay) is free and needs no funded wallet.
 metadata:
   author: SELAT-AI
-  version: "1.1"
+  version: "1.3"
   rail: mixed
   kind: multi
 ---
@@ -88,6 +88,15 @@ that the agent fuses into a single multi-signal financial intelligence brief.
   CoinGecko/Alpha Vantage/Nansen/Exa settle `MPP on Tempo`. A reachable
   `SELAT_ROUTER_URL` is required for every step **except** the Circle-Gateway
   Alchemy step.
+- **Nansen's MPP challenge is gated — a bare probe sees x402 only.** The live
+  host is dual-protocol: a plain request 402s with only the x402 challenge,
+  and the MPP `WWW-Authenticate: Payment` (method `tempo`) surfaces only when
+  probed with an `Authorization: Payment` header — exactly what selat-pay's
+  probe 2 sends. Don't conclude "x402-only" (and flip the rail) from a bare
+  probe; the MPP registry listing is accurate, and a routed-MPP charge settles
+  live (verified 2026-08-13, $0.0525, HTTP 200). Its body takes `chains` (an
+  array), not `chain` — the step passes `{"chains": ["${chain}"]}`; the old
+  `{"chain": ...}` body was the actual cause of the paid-run 422s.
 - **GET params in the query, POST params in `body`.** Alchemy is GET;
   CoinGecko, Alpha Vantage, Nansen, and Exa are POST — their params go in the body.
 - **`maxAmount` is a guardrail, not the price.** Per-step caps run from `$0.01`
